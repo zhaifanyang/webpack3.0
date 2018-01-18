@@ -1,4 +1,6 @@
 const path = require('path');
+const uglify = require('uglifyjs-webpack-plugin');
+const htmlPlugin= require('html-webpack-plugin');
 module.exports={
     //入口文件的配置项
     entry:{
@@ -23,11 +25,28 @@ module.exports={
 // query：为loaders提供额外的设置选项（可选）。
               test: /\.css$/,
               use: [ 'style-loader', 'css-loader' ]
+            },
+            {
+               test:/\.(png|jpg|gif)/ ,
+               use:[{
+               loader:'url-loader',
+               options:{
+               limit:500000
             }
           ]
     },
     //插件，用于生产模版和各项功能
-    plugins:[],
+    plugins:[
+        new uglify(),
+        new htmlPlugin({
+            minify:{
+                removeAttributeQuotes:true
+            },
+            hash:true,
+            template:'./src/index.html'
+           
+        })
+    ],
     //配置webpack开发服务功能
     devServer:{
         //设置基本目录结构

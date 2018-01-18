@@ -35,4 +35,35 @@ webpack.config.js
             }
           ]
     },
-
+////////////////
+压缩JS代码：
+我们需要在webpack.config.js中引入uglifyjs-webpack-glugin插件
+const uglify = require('uglifyjs-webpack-plugin');
+引入后在plugins配置里new一个 uglify对象就可以了，代码如下。
+    plugins:[
+        new uglify()
+    ],
+什么是开发环境，什么是生产环境。开发环境中是基本不会对js进行压缩的，在开发预览时我们需要明确的报错行数和错误信息，所以完全没有必要压缩JavasScript代码。而生产环境中才会压缩JS代码，用于加快程序的工作效率。devServer用于开发环境，而压缩JS用于生产环境，在开发环境中作生产环境的事情所以Webpack设置了冲突报错。
+///////////////////////
+两个解析图片用的loader：
+npm install --save-dev file-loader url-loader
+file-loader：解决引用路径的问题，拿background样式用url引入背景图来说，我们都知道，webpack最终会将各个模块打包成一个文件，因此我们样式中的url路径是相对入口html页面的，而不是相对于原始css文件所在的路径的。这就会导致图片引入失败。这个问题是用file-loader解决的，file-loader可以解析项目中的url引入（不仅限于css），根据我们的配置，将图片拷贝到相应的路径，再根据我们的配置，修改打包后文件引用路径，使之指向正确的文件。
+url-loader：如果图片较多，会发很多http请求，会降低页面性能。这个问题可以通过url-loader解决。url-loader会将引入的图片编码，生成dataURl。相当于把图片数据翻译成一串字符。再把这串字符打包到文件中，最终只需要引入这个文件就能访问图片了。当然，如果图片较大，编码会消耗性能。因此url-loader提供了一个limit参数，小于limit字节的文件会被转为DataURl，大于limit的还会使用file-loader进行copy。
+配置url-loader：
+  //模块：例如解读CSS,图片如何转换，压缩
+    module:{
+        rules: [
+            {
+              test: /\.css$/,
+              use: [ 'style-loader', 'css-loader' ]
+            },{
+               test:/\.(png|jpg|gif)/ ,
+               use:[{
+                   loader:'url-loader',
+                   options:{
+                       limit:500000 //limit：是把小于500000B的文件打成Base64的格式，写入JS。
+                   }
+               }]
+            }
+          ]
+    },
