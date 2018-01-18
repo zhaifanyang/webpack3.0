@@ -131,3 +131,10 @@ var website ={
         publicPath:website.publicPath
     },
 配置完成后，你再使用webpack命令进行打包，你会发现原来的相对路径改为了绝对路径，这样来讲速度更快。
+////////////////
+  "scripts": {
+    "server": "webpack-dev-server --open",
+    "build":"webpack"
+  },
+如果webpack没有全局安装，进行如上配置，配置完成后，可以在控制台输入npm run build 进行打包。
+/////////
