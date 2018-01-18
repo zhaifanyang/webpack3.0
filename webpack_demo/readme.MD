@@ -69,5 +69,65 @@ url-loader：如果图片较多，会发很多http请求，会降低页面性能。这个问题可以通过url-
     },
 为什么只使用了url-loader
 有的小伙伴会发现我们并没有在webpack.config.js中使用file-loader，但是依然打包成功了。我们需要了解file-loader和url-loader的关系。url-loader和file-loader是什么关系呢？简答地说，url-loader封装了file-loader。url-loader不依赖于file-loader，即使用url-loader时，只需要安装url-loader即可，不需要安装file-loader，因为url-loader内置了file-loader。
+/////////////////
+CSS分离:extract-text-webpack-plugin
+安装：npm install --save-dev extract-text-webpack-plugin
+引入：安装完成后，需要先用require引入。
+const extractTextPlugin = require("extract-text-webpack-plugin");
+设置Plugins：引入成功后需要在plugins属性中进行配置。这里只要new一下这个对象就可以了。
+ new extractTextPlugin("/css/index.css")
+修改代码如下：
+module:{
+        rules: [
+            {
+              test: /\.css$/,
+              use: extractTextPlugin.extract({
+                fallback: "style-loader",
+                use: "css-loader"
+              })
+            },{
+               test:/\.(png|jpg|gif)/ ,
+               use:[{
+                   loader:'url-loader',
+                   options:{
+                       limit:500000
+                   }
+               }]
+            }
+          ]
+    },
+利用extract-text-webpack-plugin插件很轻松的就把CSS文件分离了出来，但是CSS路径并不正确，
+publicPath：是在webpack.config.js文件的output选项中，主要作用就是处理静态文件路径的。
 
-
+在处理前，我们在webpack.config.js 上方声明一个对象，叫website。
+var website ={
+    publicPath:"http://192.168.1.108:1717/"
+}
+然后在output选项中引用这个对象的publicPath属性。
+ //出口文件的配置项
+    output:{
+        //输出的路径，用了Node语法
+        path:path.resolve(__dirname,'dist'),
+        //输出的文件名称
+        filename:'[name].js',
+        publicPath:website.publicPath
+    },
+配置完成后，你再使用webpack命令进行打包，你会发现原来的相对路径改为了绝对路径，这样来讲速度更快。
+图片路径问题：
+利用extract-text-webpack-plugin插件很轻松的就把CSS文件分离了出来，但是CSS路径并不正确，很多小伙伴就在这里搞个几天还是没有头绪，网上也给出了很多的解决方案，我觉的最好的解决方案是使用publicPath解决，我也一直在用。
+publicPath：是在webpack.config.js文件的output选项中，主要作用就是处理静态文件路径的。
+在处理前，我们在webpack.config.js 上方声明一个对象，叫website。
+var website ={
+    publicPath:"http://192.168.1.108:1717/"
+}
+注意，这里的IP和端口，是你本机的ip或者是你devServer配置的IP和端口。
+然后在output选项中引用这个对象的publicPath属性。
+//出口文件的配置项
+    output:{
+        //输出的路径，用了Node语法
+        path:path.resolve(__dirname,'dist'),
+        //输出的文件名称
+        filename:'[name].js',
+        publicPath:website.publicPath
+    },
+配置完成后，你再使用webpack命令进行打包，你会发现原来的相对路径改为了绝对路径，这样来讲速度更快。
