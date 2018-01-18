@@ -67,3 +67,7 @@ url-loader：如果图片较多，会发很多http请求，会降低页面性能。这个问题可以通过url-
             }
           ]
     },
+为什么只使用了url-loader
+有的小伙伴会发现我们并没有在webpack.config.js中使用file-loader，但是依然打包成功了。我们需要了解file-loader和url-loader的关系。url-loader和file-loader是什么关系呢？简答地说，url-loader封装了file-loader。url-loader不依赖于file-loader，即使用url-loader时，只需要安装url-loader即可，不需要安装file-loader，因为url-loader内置了file-loader。
+
+
