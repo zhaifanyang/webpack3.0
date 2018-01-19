@@ -5,6 +5,9 @@ var website ={
 const htmlPlugin= require('html-webpack-plugin');
 // 这是css分离配置项
 const extractTextPlugin = require("extract-text-webpack-plugin");
+//需要同步检查html模板，所以我们需要引入node的glob对象使用
+const glob = require('glob');
+const PurifyCSSPlugin = require("purifycss-webpack");
 module.exports={
     //入口文件的配置项
     entry:{
@@ -28,19 +31,39 @@ module.exports={
 // use：loader名称，就是你要使用模块的名称，这个选项也必须进行配置，否则报错；
 // include/exclude:手动添加必须处理的文件（文件夹）或屏蔽不需要处理的文件（文件夹）（可选）；
 // query：为loaders提供额外的设置选项（可选）。
-              test: /\.css$/,
-               use: extractTextPlugin.extract({
-                fallback: "style-loader",
-                use: "css-loader"
-              })
+                test: /\.css$/,
+                use: extractTextPlugin.extract({
+                      fallback: 'style-loader',
+                      use: [
+                          { loader: 'css-loader', options: { importLoaders: 1 } },
+                          'postcss-loader'
+                      ]
+                  })
             },{
-               test:/\.(png|jpg|gif)/ ,
-               use:[{
-                   loader:'url-loader',
-                   options:{
-                       limit:500000
-                   }
-               }]
+                test:/\.(png|jpg|gif)/ ,
+                use:[{
+                    loader:'url-loader',
+                    options:{
+                        limit:5000,
+                        outputPath:'images/',
+                    }
+                }]
+            },
+            {
+                test: /\.(htm|html)$/i,
+                use:[ 'html-withimg-loader'] 
+            },
+            {
+                test: /\.less$/,
+                use: extractTextPlugin.extract({
+                    use: [{
+                        loader: "css-loader"
+                    }, {
+                        loader: "less-loader"
+                    }],
+                    // use style-loader in development
+                    fallback: "style-loader"
+                })
             }
           ]
     },
@@ -54,7 +77,11 @@ module.exports={
             template:'./src/index.html'
         }),
         // 这是css分离配置项
-        new extractTextPlugin("/css/index.css")
+        new extractTextPlugin("/css/index.css"),
+        new PurifyCSSPlugin({
+        // Give paths to parse for rules. These should be absolute!
+            paths: glob.sync(path.join(__dirname, 'src/*.html')),
+            })
     ],
     //配置webpack开发服务功能
     devServer:{
