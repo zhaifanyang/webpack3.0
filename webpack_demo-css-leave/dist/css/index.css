@@ -7,6 +7,7 @@ body {
   background-image: url(http://localhost:1717/images/34c75f31199e0ce560518f46e9d71d68.jpg);
   width: 466px;
   height: 453px;
+  height: 453px;
   -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
 }
