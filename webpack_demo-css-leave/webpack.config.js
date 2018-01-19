@@ -1,6 +1,13 @@
 const path = require('path');
-var website ={
-    publicPath:"http://localhost:1717/"
+console.log( encodeURIComponent(process.env.type) );
+if(process.env.type== "build"){
+    var website={
+        publicPath: 'https://www.baidu.com:1717/'
+    }
+}else{
+    var website={
+        publicPath: 'http://localhost:1717/'
+    }
 };
 const htmlPlugin= require('html-webpack-plugin');
 // 这是css分离配置项
@@ -9,6 +16,7 @@ const extractTextPlugin = require("extract-text-webpack-plugin");
 const glob = require('glob');
 const PurifyCSSPlugin = require("purifycss-webpack");
 module.exports={
+    devtool: 'eval-source-map',
     //入口文件的配置项
     entry:{
         // 多入口文件
